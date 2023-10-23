@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10;
     int pos_x = 10;
-    int num_ex = 10000;
+    int num_ex = 30000;
     double referencia = 3.1415926535897932384626433832795028841971693993751058209749446;
     struct timeval previa, inicio, final;
     double overhead,total_time;
@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
     double step = size/num_ex;
     double total = 0;
     for (int i = 0; i < num_ex; i++) {
-        printf("node %d, inicio %f paso %f, total=%f\n", node, start_x, step, total);
         total += trapecios(start_x, step);
         start_x += step;
     }
