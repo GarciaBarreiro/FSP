@@ -8,6 +8,7 @@ double abs_subs(double a, double b) {
     return a > b ? a - b : b - a;
 }
 
+// HOLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 double gaussian(double x) {
     return exp(pow(-x, 2));
 }
