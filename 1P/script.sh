@@ -3,10 +3,10 @@
 #SBATCH -J ex1
 #SBATCH -o ex1_%j.out
 #SBATCH -e ex1_%j.err
-#SBATCH -N 2
-#SBATCH -n 4
+#SBATCH -N 32
+#SBATCH -n 256
 #SBATCH -t 00:05:00
-#SBATCH --mem=1G
+#SBATCH --mem=2G
 
 module load cesga/2020 gcc openmpi/4.1.1_ft3
 
