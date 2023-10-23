@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10;
     int pos_x = 10;
-    int num_ex = 30000;
+    int num_ex = 10000000;
     double referencia = 3.1415926535897932384626433832795028841971693993751058209749446;
     struct timeval previa, inicio, final;
     double overhead,total_time;
@@ -49,12 +49,10 @@ int main(int argc, char *argv[]) {
         total += trapecios(start_x, step);
         start_x += step;
     }
-    printf("node %d, doing something after main loop\n", node);
 
     double msg;
     int node_step;
     int iter = npes % 2 ? npes/2 + 1 : npes/2;
-    if (!node) printf("nodes == %d, iters == %d\n", npes, iter);
     int tot_nodes = npes;   // total of nodes each iter
     int jump;
     int flag = 0;
@@ -85,10 +83,12 @@ int main(int argc, char *argv[]) {
     if (!node){
         double pi  = total*total;
         double error = abs_subs(pi,referencia);
+        printf("--------------------- RESULTADOS ---------------------");
         printf("PI == %.30f\n",pi);
         printf("Difference btwn reference == %.30f\n",error);
         printf("Time == %.30f\n", total_time);
         printf("Quality == %.30f\n",1/(error*total_time));
+        printf("------------------------------------------------------")
     }
     MPI_Finalize();
     return EXIT_SUCCESS;
