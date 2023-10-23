@@ -19,6 +19,7 @@ double trapecios(double x, double step) {
 
     double square_area = y1 * step;
     double triangle_area = abs_subs(y1, y2) * step / 2;
+
     return y1 > y2 ? square_area - triangle_area : square_area + triangle_area;
 }
 
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
         jump = node_step;
         printf("node_step == %d\n", node_step);
         if (flag) flag = 0;
-        if (node_step % 2) {
+        if (node_step % 2 && tot_nodes % 2) {        // if (flag)???
             jump++;
             if (tot_nodes % 2) flag = 1;
         }
