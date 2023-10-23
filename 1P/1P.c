@@ -3,6 +3,7 @@
 #include <math.h>
 #include <mpi.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 // absolute substraction
 double abs_subs(double a, double b) {
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10;
     int pos_x = 10;
-    int num_ex = 10000;
+    int num_ex = 20000;
     double referencia = 3.1415926535897932384626433832795028841971693993751058209749446;
     struct timeval previa, inicio, final;
     double overhead,total_time;
@@ -39,13 +40,10 @@ int main(int argc, char *argv[]) {
     double size = (pos_x - neg_x) / (double)npes;
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 
-    
-
     double start_x = neg_x + size*node;
     double step = size/num_ex;
     double total = 0;
     for (int i = 0; i < num_ex; i++) {
-        printf("node %d, inicio %f paso %f, total=%f\n", node, start_x, step, total);
         total += trapecios(start_x, step);
         start_x += step;
     }
@@ -62,9 +60,8 @@ int main(int argc, char *argv[]) {
         msg = 0;
         node_step = flag ? tot_nodes / 2 + 1 : tot_nodes / 2;
         jump = node_step;
-        printf("node_step == %d\n", node_step);
         if (flag) flag = 0;
-        if (node_step % 2) {
+        if (node_step % 2 && tot_nodes % 2) {
             jump++;
             if (tot_nodes % 2) flag = 1;
         }
@@ -73,6 +70,7 @@ int main(int argc, char *argv[]) {
             printf("node %d, receiving from node %d\n", node, node+jump);
             total += msg;
         } else if (node - jump >= 0 && node < tot_nodes) {
+            sleep(1);
             MPI_Send(&total, 1, MPI_DOUBLE, node - jump, 0, MPI_COMM_WORLD);
             printf("node %d, sending to node %d\n", node, node-jump);
         }
