@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <mpi.h>
+#include <sys/time.h>
 
 // absolute substraction
 double abs_subs(double a, double b) {
@@ -9,7 +10,7 @@ double abs_subs(double a, double b) {
 }
 
 double gaussian(double x) {
-    return exp(pow(-x, 2));
+    return exp(-pow(x, 2));
 }
 
 double trapecios(double x, double step) {
@@ -18,8 +19,7 @@ double trapecios(double x, double step) {
 
     double square_area = y1 * step;
     double triangle_area = abs_subs(y1, y2) * step / 2;
-
-    return y1 > y2 ? square_area + triangle_area : square_area - triangle_area;
+    return y1 > y2 ? square_area - triangle_area : square_area + triangle_area;
 }
 
 int main(int argc, char *argv[]) {
@@ -27,19 +27,25 @@ int main(int argc, char *argv[]) {
     int neg_x = -10;
     int pos_x = 10;
     int num_ex = 10000;
-
-    printf("before init, does this print anything\n");
-
+    double referencia = 3.1415926535897932384626433832795028841971693993751058209749446;
+    struct timeval previa, inicio, final;
+    double overhead,total_time;
+    
+    gettimeofday(&previa,NULL);
+    gettimeofday(&inicio,NULL);
+    
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
-    int size = (pos_x - neg_x) / (double)npes;
+    double size = (pos_x - neg_x) / (double)npes;
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
+
+    
 
     double start_x = neg_x + size*node;
     double step = size/num_ex;
     double total = 0;
-    printf("node %d, doing something before main loop\n", node);
     for (int i = 0; i < num_ex; i++) {
+        printf("node %d, inicio %f paso %f, total=%f\n", node, start_x, step, total);
         total += trapecios(start_x, step);
         start_x += step;
     }
@@ -72,8 +78,18 @@ int main(int argc, char *argv[]) {
         }
         tot_nodes = node_step;
     }
+    gettimeofday(&final,NULL);
+    overhead = (inicio.tv_sec-previa.tv_sec+(inicio.tv_usec-previa.tv_usec)/1.e6);
+    total_time = (final.tv_sec-inicio.tv_sec+(final.tv_usec-inicio.tv_usec)/1.e6)-overhead;
 
-    if (!node) printf("pi == %lf\n", total);
+    if (!node){
+        double pi  = total*total;
+        double error = abs_subs(pi,referencia);
+        printf("PI == %.30f\n",pi);
+        printf("Difference btwn reference == %.30f\n",error);
+        printf("Time == %.30f\n", total_time);
+        printf("Quality == %.30f\n",1/(error*total_time));
+    }
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
