@@ -4,6 +4,7 @@
 #include <mpi.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <locale.h>
 
 // absolute substraction
 double abs_subs(double a, double b) {
@@ -39,8 +40,6 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
     double size = (pos_x - neg_x) / (double)npes;
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
-
-    
 
     double start_x = neg_x + size*node;
     double step = size/num_ex;
@@ -83,13 +82,26 @@ int main(int argc, char *argv[]) {
     if (!node){
         double pi  = total*total;
         double error = abs_subs(pi,referencia);
-        printf("--------------------- RESULTADOS ---------------------");
-        printf("PI == %.30f\n",pi);
-        printf("Difference btwn reference == %.30f\n",error);
-        printf("Time == %.30f\n", total_time);
-        printf("Quality == %.30f\n",1/(error*total_time));
-        printf("------------------------------------------------------");
+        double quality = 1/(error*total_time);
+        printf("--------------------- RESULTADOS ---------------------\n");
+        printf("PI == %.50f\n",pi);
+        printf("Difference btwn reference == %.50f\n",error);
+        printf("Time == %.50f\n", total_time);
+        printf("Quality == %.50f\n",quality);
+        printf("------------------------------------------------------\n");
+        // Crear el archivo CSV
+        FILE* fp = fopen("resultados.csv", "a");
+        if (fp == NULL) {
+            printf("Error al abrir el archivo %s\n", "resultados.csv");
+            exit(EXIT_FAILURE);
+        }
+        setlocale(LC_ALL, "es_ES.utf8");
+        fprintf(fp,"%d;%.50f;%.50f;%-50f\n", npes, total_time, error, quality);
+        // Cerrar el archivo CSV
+        fclose(fp);
+
     }
     MPI_Finalize();
+
     return EXIT_SUCCESS;
 }
