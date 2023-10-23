@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
         printf("Difference btwn reference == %.30f\n",error);
         printf("Time == %.30f\n", total_time);
         printf("Quality == %.30f\n",1/(error*total_time));
-        printf("------------------------------------------------------")
+        printf("------------------------------------------------------");
     }
     MPI_Finalize();
     return EXIT_SUCCESS;
