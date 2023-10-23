@@ -9,7 +9,7 @@ double abs_subs(double a, double b) {
 }
 
 double gaussian(double x) {
-    return exp(pow(-x, 2));
+    return exp(-pow(x, 2));
 }
 
 double trapecios(double x, double step) {
@@ -19,7 +19,7 @@ double trapecios(double x, double step) {
     double square_area = y1 * step;
     double triangle_area = abs_subs(y1, y2) * step / 2;
 
-    return y1 > y2 ? square_area + triangle_area : square_area - triangle_area;
+    return y1 > y2 ? square_area - triangle_area : square_area + triangle_area;
 }
 
 int main(int argc, char *argv[]) {
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
-    int size = (pos_x - neg_x) / (double)npes;
+    double size = (pos_x - neg_x) / (double)npes;
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 
     double start_x = neg_x + size*node;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         jump = node_step;
         printf("node_step == %d\n", node_step);
         if (flag) flag = 0;
-        if (node_step % 2) {
+        if (node_step % 2 && tot_nodes % 2) {        // if (flag)???
             jump++;
             if (tot_nodes % 2) flag = 1;
         }
@@ -73,7 +73,10 @@ int main(int argc, char *argv[]) {
         tot_nodes = node_step;
     }
 
-    if (!node) printf("pi == %lf\n", total);
+    if (!node) {
+        printf("sqrt(pi) == %lf\n", total);
+        printf("pi == %.50lf\n", total*total);
+    }
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
