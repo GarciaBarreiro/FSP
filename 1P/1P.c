@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10;
     int pos_x = 10;
-    int num_ex = 10000000;
+    long int num_ex = 1000000000000;
     double referencia = 3.1415926535897932384626433832795028841971693993751058209749446;
     struct timeval previa, inicio, final;
     double overhead,total_time;
