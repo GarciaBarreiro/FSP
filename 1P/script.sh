@@ -3,8 +3,8 @@
 #SBATCH -J ex1
 #SBATCH -o ex1_%j.out
 #SBATCH -e ex1_%j.err
-#SBATCH -N 32
-#SBATCH -n 128
+#SBATCH -N 16
+#SBATCH -n 64
 #SBATCH -t 01:00:00
 #SBATCH --mem=4G
 
