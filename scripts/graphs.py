@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-import numpy as np      # not needed i think
+import numpy as np
 import csv
 
 # read csv
