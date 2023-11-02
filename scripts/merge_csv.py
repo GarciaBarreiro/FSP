@@ -2,13 +2,6 @@ import csv
 import argparse
 from pathlib import Path
 
-# HOW TO:
-# 1) open input[n]                                                                                      DONE
-# 2) check cpus first line => number of nodes                                                           DONE
-# 3) when cpus < cpus[-1] => number of nodes = cpus                                                     DONE
-# 4) output all that to temp.csv                                                                        TODO
-# 5) find a way to read temp.csv and order it by number of nodes, then cpus, thus creating output       TODO
-
 # reads csv, generates another with better formating and number of nodes
 def csv_rdr_wrtr(input, output):
     with open(input, newline='') as incsv, open(output, 'w', newline='') as outcsv:
@@ -25,17 +18,6 @@ def csv_rdr_wrtr(input, output):
 
 # merges various csvs into one
 def merge_csv(inputs, output):
-    # 1) open all files
-    # 2) read first line of each file => check smaller
-    # 3) write until cpu changes => check other file
-    # 4) repeat 2) & 3) until end
-
-    # OR
-
-    # 1) open one file, dump all data to an array in memory
-    # 2) do 1) with the rest of files
-    # 3) order (check how to order by node and cpu)
-
     data = []
     for inp in inputs:
         with open(inp, newline='') as incsv:
@@ -61,7 +43,6 @@ def main():
     parser.add_argument('input_files', help='input files, separated by commas')
     parser.add_argument('-o', '--output', help='output file, defaults to ./output.csv')
     args = parser.parse_args()
-    print(args.input_files, args.output)
     input = args.input_files.split(',')
     if args.output:
         output = args.output
