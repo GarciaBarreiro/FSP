@@ -3,6 +3,7 @@
 #include <math.h>
 #include <mpi.h>
 #include <sys/time.h>
+#include <time.h>
 #include <unistd.h>
 #include <locale.h>
 
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
     double reference = 3.1415926535897932384626433832795028841971693993751058209749446;
 
     struct timeval previa, inicio, final;
+    struct timespec sleep_time = {0,1000000};   // Sleep for 1ms
     double overhead,total_time;
     
     gettimeofday(&previa,NULL);
@@ -89,7 +91,7 @@ int main(int argc, char *argv[]) {
             // printf("node %d, receiving from node %d\n", node, node+jump);
             total += msg;
         } else if (node - jump >= 0 && node < tot_nodes) {
-            sleep(1);
+            nanosleep(&sleep_time,&sleep_time);
             MPI_Send(&total, 1, MPI_DOUBLE, node - jump, 0, MPI_COMM_WORLD);
             // printf("node %d, sending to node %d\n", node, node-jump);
         }
