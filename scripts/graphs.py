@@ -96,7 +96,9 @@ def main():
     no_nodes = remove_nodes(data)
     # print(no_nodes)
 
-    plot_graph(no_nodes, 'cpus', 'time', 'proba.png', y2='err')
+    plot_graph(no_nodes, 'cpus', 'time', 'time.png')
+    plot_graph(no_nodes, 'cpus', 'qual', 'qual.png')
+    plot_graph(no_nodes, 'cpus', 'err', 'err.png')
 
 if __name__ == "__main__":
     main()
