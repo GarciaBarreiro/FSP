@@ -16,7 +16,7 @@ double gaussian(double x) {
     return exp(-pow(x, 2));
 }
 
-// calculates integral by using montecarlo
+// calculates integral using montecarlo
 long int montecarlo(long int num_iter, int x_range, int y_range) {
     double x, y;
     long int total = 0;
@@ -32,7 +32,7 @@ long int montecarlo(long int num_iter, int x_range, int y_range) {
 
 int main(int argc, char *argv[]) {
     int node = 0, npes;
-    int x_range = 10, y_range = 10; // x is [-10,10]; y is [0,20]
+    int x_range = 10, y_range = 10; // x is [-5,5]; y is [0,10]
     long int num_iter = 100000000;  // number of iterations each node does
     double reference = 3.1415926535897932384626433832795028841971693993751058209749446;
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     // the first half receives, the second half sends
     // etc
 
-    double msg;
+    long int msg;
     int node_step;
     int iter = npes % 2 ? npes/2 + 1 : npes/2;  // number of iterations. if npes is odd, one more than half
     int tot_nodes = npes;                       // node total each iter
