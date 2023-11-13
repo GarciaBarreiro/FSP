@@ -33,7 +33,7 @@ long int montecarlo(long int num_iter, int x_range, int y_range) {
 int main(int argc, char *argv[]) {
     int node = 0, npes;
     int x_range = 10, y_range = 10; // x is [-10,10]; y is [0,20]
-    long int num_iter = 100000000;  // number of iterations each node does
+    long int num_iter = 10000000000;  // number of iterations each node does
     double reference = 3.1415926535897932384626433832795028841971693993751058209749446;
 
     struct timeval previa, inicio, final;
