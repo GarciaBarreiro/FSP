@@ -30,15 +30,15 @@ double trapezoids(double x, double step) {
 int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10, pos_x = 10;        // range of function to calculate (from x -10 to x 10)
-    long int num_iter = 100000000;  // number of iterations each node does
+    long int num_iter = 100000000;      // number of iterations each node does
     double reference = 3.1415926535897932384626433832795028841971693993751058209749446;
 
-    struct timeval previa, inicio, final;
+    struct timeval t_prev, t_init, t_final;
     struct timespec sleep_time = {0,1000000};   // Sleep for 1ms
     double overhead,total_time;
     
-    gettimeofday(&previa,NULL);
-    gettimeofday(&inicio,NULL);
+    gettimeofday(&t_prev,NULL);
+    gettimeofday(&t_init,NULL);
     
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
@@ -88,22 +88,20 @@ int main(int argc, char *argv[]) {
 
         if (node < node_step) {
             MPI_Recv(&msg, 1, MPI_DOUBLE, node + jump, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
-            // printf("node %d, receiving from node %d\n", node, node+jump);
             total += msg;
         } else if (node - jump >= 0 && node < tot_nodes) {
             nanosleep(&sleep_time,&sleep_time);
             MPI_Send(&total, 1, MPI_DOUBLE, node - jump, 0, MPI_COMM_WORLD);
-            // printf("node %d, sending to node %d\n", node, node-jump);
         }
 
         tot_nodes = node_step;
     }
 
-    gettimeofday(&final,NULL);
-    overhead = (inicio.tv_sec-previa.tv_sec+(inicio.tv_usec-previa.tv_usec)/1.e6);
-    total_time = (final.tv_sec-inicio.tv_sec+(final.tv_usec-inicio.tv_usec)/1.e6)-overhead;
+    gettimeofday(&t_final,NULL);
+    overhead = (t_init.tv_sec-t_prev.tv_sec+(t_init.tv_usec-t_prev.tv_usec)/1.e6);
+    total_time = (t_final.tv_sec-t_init.tv_sec+(t_final.tv_usec-t_init.tv_usec)/1.e6)-overhead;
 
-    if (!node){     // i think we can do this outside MPI_Finalize                 
+    if (!node){
         double pi = total*total;
         double error = abs_subs(pi,reference);
         double quality = 1/(error*total_time);
@@ -116,9 +114,9 @@ int main(int argc, char *argv[]) {
         printf("------------------------------------------------------\n");
         
         // Create CSV file
-        FILE* fp = fopen("results.csv", "a");
+        FILE* fp = fopen("results_trapezoids.csv", "a");
         if (fp == NULL) {
-            printf("Error opening file %s\n", "results.csv");
+            printf("Error opening file results_trapezoids.csv\n");
             exit(EXIT_FAILURE);
         }
         setlocale(LC_ALL, "es_ES.utf8");
