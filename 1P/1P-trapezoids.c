@@ -30,7 +30,7 @@ double trapezoids(double x, double step) {
 int main(int argc, char *argv[]) {
     int node = 0, npes;
     int neg_x = -10, pos_x = 10;        // range of function to calculate (from x -10 to x 10)
-    long int num_iter = 100000000;      // number of iterations each node does
+    long int num_iter = argc > 1 ? atoi(argv[1]) : 100000000;      // number of iterations each node does
     double reference = 3.1415926535897932384626433832795028841971693993751058209749446;
 
     struct timeval t_prev, t_init, t_final;
@@ -120,7 +120,10 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
         setlocale(LC_ALL, "es_ES.utf8");
-        fprintf(fp,"%d;%.50f;%.50f;%-50f\n", npes, total_time, error, quality);
+        if (argc > 2)
+            fprintf(fp,"%d;%.50f;%.50f;%.50f\n", npes, total_time, error, quality, num_iter);
+        else
+            fprintf(fp,"%d;%.50f;%.50f;%.50f\n", npes, total_time, error, quality);
         // Closing CSV file
         fclose(fp);
 
