@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
         setlocale(LC_ALL, "es_ES.utf8");
-        if (argc > 2)
-            fprintf(fp,"%d;%.50f;%.50f;%.50f\n", npes, total_time, error, quality, num_iter);
+        if (argc > 1)
+            fprintf(fp,"%d;%.50f;%.50f;%.50f;%ld\n", npes, total_time, error, quality, num_iter);
         else
             fprintf(fp,"%d;%.50f;%.50f;%.50f\n", npes, total_time, error, quality);
         // Closing CSV file
