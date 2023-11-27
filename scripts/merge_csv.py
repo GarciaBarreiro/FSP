@@ -13,8 +13,10 @@ def csv_rdr_wrtr(input, output):
             if int(row[0]) < prev_cpus:
                 nodes = row[0]
             prev_cpus = int(row[0])
-            wrtr.writerow([nodes, row[0], row[1].replace(',','.'),
-                           row[2].replace(',','.'), row[3].replace(',','.').strip()])
+            to_write = [nodes, row[0], row[1].replace(',','.'),
+                           row[2].replace(',','.'), row[3].replace(',','.').strip()]
+            if row[4]: to_write.append(row[4])
+            wrtr.writerow(to_write)
 
 # merges various csvs into one
 def merge_csv(inputs, output):
@@ -30,6 +32,7 @@ def merge_csv(inputs, output):
                     'err': row[3],
                     'qual': row[4]
                     })
+                if row[5]: data[-1]['iter'] = row[5]
         Path.unlink(inp)
     ordered = sorted(data, key=lambda d: (d['nodes'], d['cpus']))
     with open(output, 'w', newline='') as outcsv:
