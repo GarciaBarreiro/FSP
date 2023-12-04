@@ -1,0 +1,62 @@
+Numero de dispositivos = 1
+
+Dispositivo #0
+
+ Minor Capability:		0
+
+ Major Capability:		8
+
+ MultiProcessor Count:	108
+
+ Max threads per MultiPr.:	2048
+
+ Max Grid Size:		2147483647
+
+ Max Threads per Block:	1024
+
+ Max Size for each Dim:	1024
+
+ Num 32bits reg per SM:	65536
+
+ Num 32bits reg pero block	65536
+
+ Shared Mem per MultiPr.:	164
+
+ Shared Mem per Block:	48
+
+ Global Mem:	40339
+
+ Peak Mem Clock Frec:	1215.000000
+
+ Mem Bus With:	5120
+
+ BWPeak:	1555.200000
+
+ CUDACores:	6912
+
+*****************************************************************************
+*                                                                           *
+*                    JOB EFFICIENCY REPORT (seff 5138506)                   *
+*                                                                           *
+*****************************************************************************
+
+Job ID: 5138506
+Cluster: finisterrae3
+User/Group: curso164/usc
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 32
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:01:04 core-walltime
+Job Wall-clock time: 00:00:02
+Memory Utilized: 792.00 KB
+Memory Efficiency: 0.00% of 32.00 GB
+
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ ++   Memory Efficiency is too small. Please review the requested memory. ++
+ ++ It seems that you do not need that much memory so we recommend        ++
+ ++ requesting less memory in other similar jobs.                         ++
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+*****************************************************************************
+
