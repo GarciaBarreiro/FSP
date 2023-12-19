@@ -108,7 +108,7 @@ double ** _gen_matrix(int mat_m, int mat_n) {
     }
 
     for (int i = 0; i < mat_m; i++) {
-        for (int j = 1; j < mat_n; j++) {
+        for (int j = 0; j < mat_n; j++) {
             matrix[i][j] = rand();
         }
     }
@@ -156,6 +156,15 @@ double ** _transpose(double **mat, int *mat_m, int *mat_n) {
     *mat_n = temp;
 
     return trans;
+}
+
+void _print_matrix(double **mat, int mat_m, int mat_n) {
+    for (int i = 0; i < mat_m; i++) {
+        for (int j = 0; j < mat_n; j++) {
+            printf("%lf ", mat[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -280,13 +289,22 @@ int main(int argc, char *argv[]) {
             MPI_Recv(&ok, 1, MPI_CHAR, 0, node, MPI_COMM_WORLD, NULL);
             MPI_Send(res_n, n_cols, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
         }
+
     }
 
-    for (int i = 0; i < vector_l; i++) {
-        if (!dir) printf("%lf\n", result[i]);
-        else printf("%lf ", result[i]);
+    if (!node) {
+        _print_matrix(matrix, matrix_m, matrix_m);
+        printf("\n");
+        for (int i = 0; i < vector_l; i++) {
+            printf("%lf\n", vector[i]);
+        }
+        printf("\n");
+        for (int i = 0; i < vector_l; i++) {
+            if (!dir) printf("%lf\n", result[i]);
+            else printf("%lf ", result[i]);
+        }
+        if (dir) printf("\n");
     }
-    if (dir) printf("\n");
 
     gettimeofday(&t_final, NULL);
     overhead = (t_init.tv_sec - t_prev.tv_sec + (t_init.tv_usec - t_prev.tv_usec)/1.e6);
