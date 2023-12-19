@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <mpi.h>
 #include <string.h>
+#include <time.h>
 #include <sys/time.h>
 
 #define MAX 100000
@@ -92,6 +93,43 @@ double * _get_vector(FILE *fp, int *length) {
     return vector;
 }
 
+double ** _gen_matrix(int mat_m, int mat_n) {
+    double **matrix;
+
+    if (!(matrix = malloc(sizeof(double*)*mat_m))) {
+        printf("Error allocating for matrix\n");
+        exit(1);
+    }
+    for (int i = 0; i < mat_m; i++) {
+        if (!(matrix[i] = malloc(sizeof(double)*mat_n))) {
+            printf("Error allocating for matrix\n");
+            exit(1);
+        }
+    }
+
+    for (int i = 0; i < mat_m; i++) {
+        for (int j = 1; j < mat_n; j++) {
+            matrix[i][j] = rand();
+        }
+    }
+    return matrix;
+}
+
+double * _gen_vector(int vec_l) {
+    double *vector;
+
+    if (!(vector = malloc(sizeof(double)*vec_l))) {
+        printf("Error allocating for vector\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < vec_l; i++) {
+        vector[i] = rand();
+    }
+
+    return vector;
+}
+
 double ** _transpose(double **mat, int *mat_m, int *mat_n) {
     double **trans;
     
@@ -121,30 +159,47 @@ double ** _transpose(double **mat, int *mat_m, int *mat_n) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 4) {     // optional: create random matrices
+    if (argc < 5) {
         printf("Needed the direction of the multiplication (0 = matrix*vector, 1 = vector*matrix),\n");
-        printf("a file with a matrix and one with a vector to be passed\n");
-        printf("Both with the next format:\n");
-        printf("SIZExSIZE\nx00, x01, ..., x0n\n..., ..., ..., ...\nxm0, xm1, ..., xmn\n");
+        // printf("a file with a matrix and one with a vector to be passed\n");
+        printf("the two dimensions of a matrix and the length of a vector\n");
+        // printf("Both with the next format:\n");
+        // printf("SIZExSIZE\nx00, x01, ..., x0n\n..., ..., ..., ...\nxm0, xm1, ..., xmn\n");
         return 1;
     }
 
     int dir = atoi(argv[1]);
+    int matrix_m = atoi(argv[2]);
+    int matrix_n = atoi(argv[3]);
+    int vector_l = atoi(argv[4]);
+
+    if (!dir && matrix_n != vector_l) {
+        printf("Matrix has dimension %dx%d.\n", matrix_m, matrix_n);
+        printf("Vector has length %d\n", vector_l);
+        printf("Unable to multiply them\n");
+        return 1;
+    } else if (dir && vector_l != matrix_m) {
+        printf("Vector has length %d\n", vector_l);
+        printf("Matrix has dimension %dx%d.\n", matrix_m, matrix_n);
+        printf("Unable to multiply them\n");
+        return 1;
+    }
+
+    /*
     FILE *fp = fopen(argv[2], "r");
     FILE *fq = fopen(argv[3], "r");
     if (!fp || !fq) {
         printf("Error opening files\n");
         return 1;
     }
+    */
+    srand(time(NULL));
 
     int node = 0, npes;
     struct timeval t_prev, t_init, t_final;
     double overhead, total_time;
 
-    int matrix_m = 0;
-    int matrix_n = 0;
     double **matrix = NULL;
-    int vector_l = 0;
     double *vector = NULL;
     int n_cols = 0;
     double *result = NULL;
@@ -158,23 +213,9 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 
     if (!node) {    // node 0 builds matrices
-        matrix = _get_matrix(fp, &matrix_m, &matrix_n);
+        matrix = _gen_matrix(matrix_m, matrix_n);
         if (dir) matrix = _transpose(matrix, &matrix_m, &matrix_n);
-        vector = _get_vector(fq, &vector_l);
-        fclose(fp);
-        fclose(fq);
-
-        if (!dir && matrix_n != vector_l) {
-            printf("Matrix has dimension %dx%d.\n", matrix_m, matrix_n);
-            printf("Vector has length %d\n", vector_l);
-            printf("Unable to multiply them\n");
-            return 1;
-        } else if (dir && vector_l != matrix_m) {
-            printf("Vector has length %d\n", vector_l);
-            printf("Matrix has dimension %dx%d.\n", matrix_m, matrix_n);
-            printf("Unable to multiply them\n");
-            return 1;
-        }
+        vector = _gen_vector(vector_l);
 
         // first broadcast vector size
         // then matrix size
