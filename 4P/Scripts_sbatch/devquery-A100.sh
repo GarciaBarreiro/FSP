@@ -3,6 +3,6 @@
 #SBATCH -c 32
 #SBATCH --mem 32G
 #SBATCH --gres gpu:a100
-#SBATCH -o devquery-a100.out
+#SBATCH -o out_A100.out
 #SBATCH -t 00:00:01
-srun devquery
+srun $1 $2
