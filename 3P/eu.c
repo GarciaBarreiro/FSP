@@ -20,7 +20,6 @@ double ** _get_matrix(FILE *fp, int *m, int *n) {
     char dst_m[MAX];
     strncpy(dst_m, line, strchr(line, 'x') - line); // size is difference of pointer locations
     *m = atoi(dst_m);
-    printf("m == %d, n == %d\n", *m, *n);
 
     if (!(matrix = malloc(sizeof(double*)*(*m)))) {
         printf("Error allocating for matrix\n");
@@ -34,17 +33,14 @@ double ** _get_matrix(FILE *fp, int *m, int *n) {
     }
 
     for (int i = 0; i < *m; i++) {
-        printf("%d\n", i);
         if (!fgets(line, MAX, fp)) {
             printf("Error reading file\n");
             exit(1);
         }
         char *rest = line;
         matrix[i][0] = atof(strtok_r(rest, " ", &rest));
-        printf("%lf\n", matrix[i][0]);
         for (int j = 1; j < *n; j++) {
             matrix[i][j] = atof(strtok_r(rest, " ", &rest));
-            printf("%lf\n", matrix[i][j]);
         }
     }
     return matrix;
@@ -62,7 +58,6 @@ double * _get_vector(FILE *fp, int *length) {
     char dst_m[MAX];
     strncpy(dst_m, line, strchr(line, 'x') - line); // size is difference of pointer locations
     int m = atoi(dst_m);
-    printf("m == %d, n == %d\n", m, n);
 
     *length = (m == 1) ? n : m;
 
@@ -79,11 +74,9 @@ double * _get_vector(FILE *fp, int *length) {
 
         char *rest = line;
         vector[0] = atof(strtok_r(rest, " ", &rest));
-        printf("%lf\n", vector[0]);
         
         for (int i = 1; i < *length; i++) {
             vector[i] = atof(strtok_r(rest, " ", &rest));
-            printf("%lf\n", vector[i]);
         }
     } else {            // vertical vector
         for (int i = 0; i < *length; i++) {
@@ -93,11 +86,38 @@ double * _get_vector(FILE *fp, int *length) {
             }
 
             vector[i] = atof(line);
-            printf("%lf\n", vector[i]);
         }
     }
 
     return vector;
+}
+
+double ** _transpose(double **mat, int *mat_m, int *mat_n) {
+    double **trans;
+    
+    if (!(trans = malloc(sizeof(double*)*(*mat_n)))) {
+        printf("Error allocating transpose\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < *mat_n; i++) {
+        if (!(trans[i] = malloc(sizeof(double)*(*mat_m)))) {
+            printf("Error allocating transpose\n");
+            exit(1);
+        }
+    }
+
+    for (int i = 0; i < *mat_n; i++) {
+        for (int j = 0; j < *mat_m; j++) {
+            trans[i][j] = mat[j][i];
+        }
+    }
+    
+    int temp = *mat_m;
+    *mat_m = *mat_n;
+    *mat_n = temp;
+
+    return trans;
 }
 
 int main(int argc, char *argv[]) {
@@ -139,8 +159,9 @@ int main(int argc, char *argv[]) {
 
     if (!node) {    // node 0 builds matrices
         matrix = _get_matrix(fp, &matrix_m, &matrix_n);
-        fclose(fp);
+        if (dir) matrix = _transpose(matrix, &matrix_m, &matrix_n);
         vector = _get_vector(fq, &vector_l);
+        fclose(fp);
         fclose(fq);
 
         if (!dir && matrix_n != vector_l) {
@@ -158,17 +179,19 @@ int main(int argc, char *argv[]) {
         // first broadcast vector size
         // then matrix size
         // then vector && matrix
-        MPI_Bcast(&vector_l, 1, MPI_INT, node, MPI_COMM_WORLD);  // vector size
-        MPI_Bcast(vector, vector_l, MPI_DOUBLE, node, MPI_COMM_WORLD);
-        int start_col = 0;
-        n_cols = npes == 1 ? 1 : matrix_n / (npes - 1);
-        MPI_Bcast(&matrix_m, 1, MPI_INT, node, MPI_COMM_WORLD);
-        MPI_Bcast(&n_cols, 1, MPI_INT, node, MPI_COMM_WORLD);
-        int pos = 0;
-        for (int dest = 1; dest < npes; dest++) {
-            for (int i = 0; i < n_cols; i++) {
-                pos = ((dest - 1) * n_cols) + i;
-                MPI_Send(matrix[pos], matrix_m, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);  // maybe we can use tag to later reconstruct matrix
+        if (npes != 1) {
+            MPI_Bcast(&vector_l, 1, MPI_INT, node, MPI_COMM_WORLD);  // vector size
+            MPI_Bcast(vector, vector_l, MPI_DOUBLE, node, MPI_COMM_WORLD);
+            int start_col = 0;
+            n_cols = matrix_n;
+            MPI_Bcast(&matrix_m, 1, MPI_INT, node, MPI_COMM_WORLD);
+            MPI_Bcast(&n_cols, 1, MPI_INT, node, MPI_COMM_WORLD);
+            int pos = 0;
+            for (int dest = 1; dest < npes; dest++) {
+                for (int i = 0; i < n_cols; i++) {
+                    pos = ((dest - 1) * n_cols) + i;
+                    MPI_Send(matrix[pos], matrix_m, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);  // maybe we can use tag to later reconstruct matrix
+                }
             }
         }
 
@@ -194,31 +217,35 @@ int main(int argc, char *argv[]) {
         res_n = receive_send(node);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    if (npes != 1) {
+        MPI_Barrier(MPI_COMM_WORLD);
 
-    if (!node) {
-        char ok = '0';
-        double *temp;
-        if (!(temp = malloc(sizeof(double)*(matrix_n/(npes - 1))))) {
-            printf("%d: Error allocating for temp\n", node);
-            exit(1);
-        }
-        for (int i = 1; i < npes; i++) {
-            MPI_Send(&ok, 1, MPI_CHAR, i, i, MPI_COMM_WORLD);
-            MPI_Recv(temp, n_cols, MPI_DOUBLE, i, i, MPI_COMM_WORLD, NULL);
-            for (int j = 0; j < n_cols; j++) {
-                result[(i - 1) * n_cols + j] = temp[j];
+        if (!node) {
+            char ok = '0';
+            double *temp;
+            if (!(temp = malloc(sizeof(double)*(matrix_n/(npes - 1))))) {
+                printf("%d: Error allocating for temp\n", node);
+                exit(1);
             }
+            for (int i = 1; i < npes; i++) {
+                MPI_Send(&ok, 1, MPI_CHAR, i, i, MPI_COMM_WORLD);
+                MPI_Recv(temp, n_cols, MPI_DOUBLE, i, i, MPI_COMM_WORLD, NULL);
+                for (int j = 0; j < n_cols; j++) {
+                    result[(i - 1) * n_cols + j] = temp[j];
+                }
+            }
+        } else {
+            char ok;
+            MPI_Recv(&ok, 1, MPI_CHAR, 0, node, MPI_COMM_WORLD, NULL);
+            MPI_Send(res_n, n_cols, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
         }
-    } else {
-        char ok;
-        MPI_Recv(&ok, 1, MPI_CHAR, 0, node, MPI_COMM_WORLD, NULL);
-        MPI_Send(res_n, n_cols, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
     }
 
     for (int i = 0; i < vector_l; i++) {
-        printf("%lf\n", result[i]);
+        if (!dir) printf("%lf\n", result[i]);
+        else printf("%lf ", result[i]);
     }
+    if (dir) printf("\n");
 
     gettimeofday(&t_final, NULL);
     overhead = (t_init.tv_sec - t_prev.tv_sec + (t_init.tv_usec - t_prev.tv_usec)/1.e6);
