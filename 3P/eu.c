@@ -1,11 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
+#include <mpi/mpi.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
 #define MAX 100000
+
+// defining tags for MPI_Recv, MPI_Send and all that
+#define V_L_TAG 0
+#define V_TAG 1
+#define M_M_TAG 2
+#define M_N_TAG 3
+#define M_TAG 4
 
 double * receive_send(int node);
 
@@ -231,8 +238,8 @@ int main(int argc, char *argv[]) {
         // then vector && matrix
         if (npes != 1) {
             printf("this is a test, befor bcast\n");
-            MPI_Bcast(&vector_l, 1, MPI_INT, node, MPI_COMM_WORLD);  // vector size
-            MPI_Bcast(vector, vector_l, MPI_DOUBLE, node, MPI_COMM_WORLD);
+            MPI_Bcast(&vector_l, 1, MPI_INT, 0, MPI_COMM_WORLD);  // vector size
+            MPI_Bcast(vector, vector_l, MPI_DOUBLE, 0, MPI_COMM_WORLD);
             int start_col = 0;
             n_cols = matrix_n;
             MPI_Bcast(&matrix_m, 1, MPI_INT, node, MPI_COMM_WORLD);
