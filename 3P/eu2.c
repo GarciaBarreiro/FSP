@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi/mpi.h>    // test if this works in cesga
+#include <mpi.h>    // test if this works in cesga
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -166,13 +166,15 @@ int main(int argc, char *argv[]) {
     MPI_Bcast(&mat_m, 1, MPI_LONG, 0, MPI_COMM_WORLD);
     MPI_Bcast(&n_rows, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
+    short flag = 0;
     if (!node) {
         // waits until node 1 finishes allocating, then starts sending data
-        MPI_Recv(NULL, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
+        MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long col = 0;
         for (int dest = 1; dest < npes + 1; dest++) {
             for (int i = 0; i < n_rows; i++) {
                 col = (dest - 1) * n_rows + i;
+                printf("%d: col = %ld\n", node, col);
                 MPI_Send(mat[col], mat_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);
             }
         }
@@ -191,7 +193,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (node == 1) {
-            MPI_Send(NULL, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
+            MPI_Send(&flag, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
         for (long i = 0; i < mat_m; i++) {
