@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>    // test if this works in cesga
+#include <mpi/mpi.h>    // test if this works in cesga
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -149,7 +149,8 @@ int main(int argc, char *argv[]) {
         mat = _gen_matrix(mat_m, mat_n);
         if (dir) mat = _transpose(&mat, &mat_m, &mat_n);
         vec = _gen_vector(vec_l);
-        n_rows = mat_m / npes;
+        // n_rows = mat_m / npes;   // TODO: probably do like this
+        n_rows = mat_m / (npes - 1);
     }
 
     MPI_Bcast(&vec_l, 1, MPI_LONG, 0, MPI_COMM_WORLD);
@@ -171,7 +172,7 @@ int main(int argc, char *argv[]) {
         // waits until node 1 finishes allocating, then starts sending data
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long col = 0;
-        for (int dest = 1; dest < npes + 1; dest++) {
+        for (int dest = 1; dest < npes; dest++) {
             for (int i = 0; i < n_rows; i++) {
                 col = (dest - 1) * n_rows + i;
                 printf("%d: col = %ld\n", node, col);
@@ -201,8 +202,57 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    printf("\n");
     printf("rank: %d\n", node);
+    printf("\n");
     _print_matrix(mat, mat_m, mat_n);
+    printf("\n");
+    for (long i = 0; i < vec_l; i++) {
+        printf("%lf ", vec[i]);
+    }
+    printf("\n");
 
-    // TODO: multiplication
+    double *res;
+    if (!(res = malloc(sizeof(double)*mat_m))) {
+        printf("%d: Error allocating result vector\n", node);
+        // TODO: maybe abort here and some other places too?
+        exit(1);
+    }
+
+    int start = 0;
+    if (!node) {
+        if (n_rows * npes < mat_m) {
+            start = (npes - 1) * n_rows;
+            for (long i = start; i < mat_m; i++) {
+                for (long j = 0; j < mat_n; j++) {
+                    res[i] += vec[j] * mat[i][j];
+                }
+            }
+        }
+    } else {
+        for (long i = 0; i < mat_m; i++) {
+            for (long j = 0; j < mat_n; j++) {
+                res[i] += vec[j] * mat[i][j];
+            }
+        }
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (!node) {
+        for (int dest = 1; dest < npes; dest++) {
+            MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
+            MPI_Recv(&res[dest*n_rows], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);  // this is a test, if it doesn't work, we malloc some things
+        }
+    } else {
+        MPI_Recv(&flag, 1, MPI_SHORT, 0, node, MPI_COMM_WORLD, NULL);
+        MPI_Send(res, mat_m, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
+    }
+
+    if (!node) {
+        for (long i = 0; i < mat_m; i++) {
+            printf("%lf ", res[i]);
+        }
+        printf("\n");
+    }
 }
