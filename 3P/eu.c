@@ -230,6 +230,7 @@ int main(int argc, char *argv[]) {
         // then matrix size
         // then vector && matrix
         if (npes != 1) {
+            printf("this is a test, befor bcast\n");
             MPI_Bcast(&vector_l, 1, MPI_INT, node, MPI_COMM_WORLD);  // vector size
             MPI_Bcast(vector, vector_l, MPI_DOUBLE, node, MPI_COMM_WORLD);
             int start_col = 0;
@@ -319,16 +320,17 @@ double * receive_send(int node) {
     int mat_m, mat_n;
     double **mat;
 
+    printf("this is a test, before recv\n");
     MPI_Recv(&vec_l, 1, MPI_INT, 0, node, MPI_COMM_WORLD, NULL);
     if (!(vec = malloc(sizeof(double)*vec_l))) {
         printf("Error allocating for vector\n");
         exit(1);
     }
-    printf("%d, received v_l (%d)", node, vec_l);
+    printf("%d, received v_l (%d)\n", node, vec_l);
     MPI_Recv(vec, vec_l, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
     MPI_Recv(&mat_m, 1, MPI_INT, 0, node, MPI_COMM_WORLD, NULL);
     MPI_Recv(&mat_n, 1, MPI_INT, 0, node, MPI_COMM_WORLD, NULL);
-    printf("%d, received mat_m and mat_n (%d x %d)", node, mat_m, mat_n);
+    printf("%d, received mat_m and mat_n (%d x %d)\n", node, mat_m, mat_n);
 
     if (!(mat = malloc(sizeof(double*)*mat_m))) {
         printf("Error allocating for matrix\n");
