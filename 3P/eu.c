@@ -324,9 +324,11 @@ double * receive_send(int node) {
         printf("Error allocating for vector\n");
         exit(1);
     }
+    printf("%d, received v_l (%d)", node, vec_l);
     MPI_Recv(vec, vec_l, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
     MPI_Recv(&mat_m, 1, MPI_INT, 0, node, MPI_COMM_WORLD, NULL);
     MPI_Recv(&mat_n, 1, MPI_INT, 0, node, MPI_COMM_WORLD, NULL);
+    printf("%d, received mat_m and mat_n (%d x %d)", node, mat_m, mat_n);
 
     if (!(mat = malloc(sizeof(double*)*mat_m))) {
         printf("Error allocating for matrix\n");
@@ -341,7 +343,7 @@ double * receive_send(int node) {
     }
 
     for (int i = 0; i < mat_m; i++) {
-        MPI_Recv(mat, mat_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
+        MPI_Recv(mat[i], mat_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
     }
 
     // mult
