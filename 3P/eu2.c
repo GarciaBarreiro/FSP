@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
+#include <mpi/mpi.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -260,6 +260,7 @@ int main(int argc, char *argv[]) {
         }
     } else {
         MPI_Recv(&flag, 1, MPI_SHORT, 0, node, MPI_COMM_WORLD, NULL);
+        // TODO: creo que o que se envia é mat_n
         MPI_Send(res, mat_m, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
     }
 
