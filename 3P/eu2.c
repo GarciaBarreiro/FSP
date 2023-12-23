@@ -24,7 +24,7 @@ double **_gen_matrix(int mat_m, int mat_n) {
 
     for (int i = 0; i < mat_m; i++) {
         for (int j = 0; j < mat_n; j++) {
-            matrix[i][j] = rand();
+            matrix[i][j] = rand() % 1000 + ((rand() % 100) / 100.0);
         }
     }
     return matrix;
@@ -39,7 +39,7 @@ double *_gen_vector(int vec_l) {
     }
 
     for (int i = 0; i < vec_l; i++) {
-        vector[i] = rand();
+        vector[i] = rand() % 1000 + ((rand() % 100) / 100.0);
     }
 
     return vector;
@@ -251,10 +251,25 @@ int main(int argc, char *argv[]) {
         MPI_Send(res, mat_m, MPI_DOUBLE, 0, node, MPI_COMM_WORLD);
     }
 
+    gettimeofday(&t_final, NULL);
+    overhead = (t_init.tv_sec-t_prev.tv_sec+(t_init.tv_usec-t_prev.tv_usec)/1.e6);
+    total_time = (t_final.tv_sec-t_init.tv_sec+(t_final.tv_usec-t_init.tv_usec)/1.e6)-overhead;
+
     if (!node) {
+        printf("\n\nRESULT:\n");
         for (long i = 0; i < mat_m; i++) {
             printf("%lf ", res[i]);
         }
         printf("\n");
+
+        FILE *fp = fopen("res_3P_eu.csv", "a");
+        if (!fp) {
+            printf("Error opening res file\n");
+            return 1;
+        }
+
+        fprintf(fp, "%d, %d, %ld, %ld, %ld, %.50f\n", npes, dir, mat_m, mat_n, vec_l, total_time);
     }
+
+    MPI_Finalize();
 }
