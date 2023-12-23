@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi/mpi.h>    // test if this works in cesga
+#include <mpi.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    MPI_Bcast(&vec, vec_l, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(vec, vec_l, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     MPI_Bcast(&mat_m, 1, MPI_LONG, 0, MPI_COMM_WORLD);
     MPI_Bcast(&n_rows, 1, MPI_LONG, 0, MPI_COMM_WORLD);
@@ -213,6 +213,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
 
     // TODO: there's an error from here to the end, i don't know where
+    // maybe not
     double *res;
     if (!(res = malloc(sizeof(double)*mat_m))) {
         printf("%d: Error allocating result vector\n", node);
