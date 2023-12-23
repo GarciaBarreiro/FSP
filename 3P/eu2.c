@@ -45,7 +45,7 @@ double *_gen_vector(int vec_l) {
     return vector;
 }
 
-double **_transpose(double ***mat, long *mat_m, long *mat_n) {
+double **_transpose(double **mat, long *mat_m, long *mat_n) {
     double **trans;
     
     if (!(trans = malloc(sizeof(double*)*(*mat_n)))) {
@@ -62,7 +62,7 @@ double **_transpose(double ***mat, long *mat_m, long *mat_n) {
 
     for (long i = 0; i < *mat_n; i++) {
         for (long j = 0; j < *mat_m; j++) {
-            trans[i][j] = *mat[j][i];
+            trans[i][j] = mat[j][i];
         }
     }
     
@@ -72,18 +72,38 @@ double **_transpose(double ***mat, long *mat_m, long *mat_n) {
 
     // TODO: check this works
     for (long i = 0; i < *mat_m; i++) {
-        free(*mat[i]);
+        free(mat[i]);
     }
     free(mat);
 
     return trans;
 }
 
-void _print_matrix(double **mat, int mat_m, int mat_n) {
-    for (int i = 0; i < mat_m; i++) {
-        for (int j = 0; j < mat_n; j++) {
-            printf("%lf ", mat[i][j]);
+void _print_matrix(double **mat, long mat_m, long mat_n) {
+    for (long i = 0; i < mat_m; i++) {
+        for (long j = 0; j < mat_n; j++) {
+            printf("%.2lf ", mat[i][j]);
         }
+        printf("\n");
+    }
+}
+
+void _print_mult(int dir, double **mat, long mat_m, long mat_n, double *vec, long vec_l) {
+    if (!dir) {
+        printf("Matrix:\n");
+        _print_matrix(mat, mat_m, mat_n);
+        printf("\nVector:\n");
+        for (long i; i < vec_l; i++) {
+            printf("%.2lf\n", vec[i]);
+        }
+        printf("\n");
+    } else {
+        printf("Vector:\n");
+        for (long i; i < vec_l; i++) {
+            printf("%.2lf ", vec[i]);
+        }
+        printf("\n\nMatrix:\n");
+        _print_matrix(mat, mat_m, mat_n);
         printf("\n");
     }
 }
@@ -112,7 +132,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // all vars that rank 0 will have fully
+    // all vars that rank 0 will fully have
     double **mat = NULL;
     double *vec = NULL;
     long n_rows = 0;
@@ -147,8 +167,12 @@ int main(int argc, char *argv[]) {
     if (!node) {
         srand(time(NULL));
         mat = _gen_matrix(mat_m, mat_n);
-        if (dir) mat = _transpose(&mat, &mat_m, &mat_n);
+
+        if (mat_m < 10 && mat_n < 10) _print_mult(dir, mat, mat_m, mat_n, vec, vec_l);
+
+        if (dir) mat = _transpose(mat, &mat_m, &mat_n);
         vec = _gen_vector(vec_l);
+
         // n_rows = mat_m / npes;   // TODO: probably do like this
         n_rows = mat_m / (npes - 1);
     }
@@ -202,18 +226,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("\n");
-    printf("rank: %d\n", node);
-    printf("\n");
-    _print_matrix(mat, mat_m, mat_n);
-    printf("\n");
-    for (long i = 0; i < vec_l; i++) {
-        printf("%lf ", vec[i]);
-    }
-    printf("\n");
-
-    // TODO: there's an error from here to the end, i don't know where
-    // maybe not
     double *res;
     if (!(res = malloc(sizeof(double)*mat_m))) {
         printf("%d: Error allocating result vector\n", node);
@@ -223,7 +235,7 @@ int main(int argc, char *argv[]) {
 
     int start = 0;
     if (!node) {
-        if (n_rows * (npes - 1) < mat_m) {  // TODO: check if this is correct
+        if (n_rows * (npes - 1) < mat_m) {
             start = (npes - 1) * n_rows;
             for (long i = start; i < mat_m; i++) {
                 for (long j = 0; j < mat_n; j++) {
@@ -244,7 +256,7 @@ int main(int argc, char *argv[]) {
     if (!node) {
         for (int dest = 1; dest < npes; dest++) {
             MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
-            MPI_Recv(&res[(dest - 1)*n_rows], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);  // this is a test, if it doesn't work, we malloc some things
+            MPI_Recv(&res[(dest - 1)*n_rows], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);
         }
     } else {
         MPI_Recv(&flag, 1, MPI_SHORT, 0, node, MPI_COMM_WORLD, NULL);
@@ -258,11 +270,11 @@ int main(int argc, char *argv[]) {
     if (!node) {
         printf("\n\nRESULT:\n");
         for (long i = 0; i < mat_m; i++) {
-            printf("%lf ", res[i]);
+            printf("%.4lf%s", res[i], dir ? " " : "\n");
         }
         printf("\n");
 
-        FILE *fp = fopen("res_3P_eu.csv", "a");
+        FILE *fp = fopen("res_3P_6.csv", "a");
         if (!fp) {
             printf("Error opening res file\n");
             return 1;
