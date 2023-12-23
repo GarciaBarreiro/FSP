@@ -212,6 +212,7 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
 
+    // TODO: there's an error from here to the end, i don't know where
     double *res;
     if (!(res = malloc(sizeof(double)*mat_m))) {
         printf("%d: Error allocating result vector\n", node);
@@ -221,7 +222,7 @@ int main(int argc, char *argv[]) {
 
     int start = 0;
     if (!node) {
-        if (n_rows * npes < mat_m) {
+        if (n_rows * (npes - 1) < mat_m) {  // TODO: check if this is correct
             start = (npes - 1) * n_rows;
             for (long i = start; i < mat_m; i++) {
                 for (long j = 0; j < mat_n; j++) {
@@ -242,7 +243,7 @@ int main(int argc, char *argv[]) {
     if (!node) {
         for (int dest = 1; dest < npes; dest++) {
             MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
-            MPI_Recv(&res[dest*n_rows], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);  // this is a test, if it doesn't work, we malloc some things
+            MPI_Recv(&res[(dest - 1)*n_rows], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);  // this is a test, if it doesn't work, we malloc some things
         }
     } else {
         MPI_Recv(&flag, 1, MPI_SHORT, 0, node, MPI_COMM_WORLD, NULL);
