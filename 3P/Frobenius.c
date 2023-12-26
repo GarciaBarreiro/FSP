@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     if(F > N/npes) {
         printf("El tamaño del paso es excesivo.\n");
         printf("El tamaño máximo permitido para este caso es: %ld\n",N/npes);
-        printf("Considere reducir el paso.\n")
+        printf("Considere reducir el paso.\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
         return 1;
     }
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 	printf("---------------------- RESULTS -----------------------\n");
         printf("Frobenius Norm == %.50f\n", norm);
         printf("Time == %.50f\n", total_time);
-	    printf(" Rows per proc = %d\n", F);
+	    printf(" Rows per proc = %ld\n", F);
         printf("------------------------------------------------------\n");
 
         // Create CSV file
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
         }
         setlocale(LC_ALL, "es_ES.utf8");
 
-        fprintf(fp,"%d;%.50f;%d\n", npes, total_time, F);
+        fprintf(fp,"%d;%.50f;%ld\n", npes, total_time, F);
 
         // Closing CSV file
         fclose(fp); 
