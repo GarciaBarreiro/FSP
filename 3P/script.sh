@@ -17,6 +17,7 @@ for nN in {1,2,4,8}; do
       echo "Executing..."
       for i in {1..5}; do
         srun -N $nN -n $np $1 $2
+        echo $1 $2
       done
     fi
   done
