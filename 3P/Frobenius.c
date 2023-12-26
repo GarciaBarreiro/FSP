@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
         }
         setlocale(LC_ALL, "es_ES.utf8");
 
-        fprintf(fp,"%d;%.50f;%ld\n", npes, total_time,norm, F);
+        fprintf(fp,"%d;%.50f;%ld,%.50f\n", npes, total_time, norm, F);
 
         // Closing CSV file
         fclose(fp); 
