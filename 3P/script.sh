@@ -16,7 +16,8 @@ for nN in {1,2,4,8}; do
     if [ $np -ge $nN ]; then
       echo "Executing..."
       for i in {1..5}; do
-        srun -N $nN -n $np $1 $2
+        srun -N $nN -n $np $1 $2 $3
+        echo $1 $2 $3
       done
     fi
   done
