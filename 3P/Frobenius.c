@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     double **A = allocate_matrix(N, N);
 
-    int i, j, node, npes;
+    int i, j, node = 0, npes;
     double s_local = 0.0, s = 0.0, norm = 0.0;
 
     MPI_Init(&argc, &argv);
