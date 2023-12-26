@@ -45,6 +45,9 @@ int main(int argc, char *argv[]) {
     long N = atoi(argv[1]); // Tamaño de la matriz
     long F = atoi(argv[2]); // Paso de la distribución cíclica
 
+	printf("N: %ld \n",N);
+	printf("F: %ld \n",F);
+
     if (N <= 0) {
         printf("El tamaño de a matriz debe de ser mayor que cero.\n");
         return EXIT_FAILURE;
