@@ -139,14 +139,14 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-	    printf("S_local node 0: %d\n",s_local);
+	    printf("S_local node 0: %f\n",s_local);
     }else{
         for (long i = 0; i < F; i++) {
             for (long j = 0; j < N; j++) {
                 s_local += A[i][j] * A[i][j];
             }
         }
-	    printf("S_local: %d\n",s_local);
+	    printf("S_local: %f\n",s_local);
     }
     
     // Reducción para obtener la suma total s en el proceso 0
