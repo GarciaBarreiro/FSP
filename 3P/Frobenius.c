@@ -55,13 +55,14 @@ int main(int argc, char *argv[]) {
 
     double **A = allocate_matrix(N, N);
 
-    int i, j, node = 0, npes;
+    int node = 0, npes;
     double s_local = 0.0, s = 0.0, norm = 0.0;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
 
+	
     if (npes > N) {
         printf("Número de nodos excesivo para el tamaño de la matriz.\n");
         printf("Reduzca el número de nodos.\n");
