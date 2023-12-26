@@ -53,15 +53,12 @@ int main(int argc, char *argv[]) {
     gettimeofday(&t_prev,NULL);
     gettimeofday(&t_init,NULL);
 
-    double **A = allocate_matrix(N, N);
-
-    int node = 0, npes;
-    double s_local = 0.0, s = 0.0, norm = 0.0;
-
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
 
+    int node = 0, npes;
+    double s_local = 0.0, s = 0.0, norm = 0.0;
 	
     if (npes > N) {
         printf("Número de nodos excesivo para el tamaño de la matriz.\n");
@@ -79,6 +76,7 @@ int main(int argc, char *argv[]) {
     }
     // Proceso 0 inicializa y envía la matriz A a todos los procesos
     if (!node) {
+	double **A = allocate_matrix(N, N);
         // Inicialización de la matriz A (aquí puedes cargarla desde un archivo o generarla)
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < N; j++) {
