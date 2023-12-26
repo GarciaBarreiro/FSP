@@ -86,16 +86,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf( "TODO BIEN HASTA AQUI \n");
-
     // Envío el tamaño de la Matriz N a todos los procesos
     MPI_Bcast(&N, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
 //    if (node) {
 //        double **A = allocate_matrix(N, N);
 //    }
-
-	printf( "TODO BIEN HASTA AQUI \n");
 
     // Envío el paso F de la distribución cíclica a todos los procesos
     MPI_Bcast(&F, 1, MPI_LONG, 0, MPI_COMM_WORLD);
@@ -106,6 +102,9 @@ int main(int argc, char *argv[]) {
     short start = 0;
 
     if(!node) {
+
+	printf( "TODO BIEN HASTA AQUI \n");
+	    
         // Empieza a trabajar cuando el nodo 1 acaba la función allocate_matrix()
         MPI_Recv(&start,1,MPI_SHORT,1,MPI_ANY_TAG,MPI_COMM_WORLD,NULL);
         long fila = 0;
