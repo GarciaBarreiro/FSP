@@ -53,11 +53,13 @@ int main(int argc, char *argv[]) {
     gettimeofday(&t_prev,NULL);
     gettimeofday(&t_init,NULL);
 
+    int node = 0, npes;
+    double **A = NULL;
+	
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
 
-    int node = 0, npes;
     double s_local = 0.0, s = 0.0, norm = 0.0;
 	
     if (npes > N) {
@@ -76,7 +78,7 @@ int main(int argc, char *argv[]) {
     }
     // Proceso 0 inicializa y envía la matriz A a todos los procesos
     if (!node) {
-	double **A = allocate_matrix(N, N);
+	A = allocate_matrix(N, N);
         // Inicialización de la matriz A (aquí puedes cargarla desde un archivo o generarla)
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < N; j++) {
@@ -111,14 +113,14 @@ int main(int argc, char *argv[]) {
         }
     } else {
 	    
-        double **B = allocate_matrix(F, N);
+        A = allocate_matrix(F, N);
 	
         if(node == 1) {
             MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
         for (long i = 0; i < F; i++) {
-            MPI_Recv(B[i], N, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
+            MPI_Recv(A[i], N, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
         }
 
     }
@@ -141,8 +143,8 @@ int main(int argc, char *argv[]) {
     }else{
         for (long i = 0; i < F; i++) {
             for (long j = 0; j < N; j++) {
-		printf("%f",B[i][j]);
-                s_local += B[i][j] * B[i][j];
+		printf("%f",A[i][j]);
+                s_local += A[i][j] * A[i][j];
             }
         }
 	    printf("\nS_local: %f\n",s_local);
@@ -181,7 +183,7 @@ int main(int argc, char *argv[]) {
         fclose(fp); 
         free_matrix(A, N);
     }else{
-        free_matrix(B, F);
+        free_matrix(A, F);
     }
 
     MPI_Finalize();
