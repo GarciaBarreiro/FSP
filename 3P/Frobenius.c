@@ -180,11 +180,12 @@ int main(int argc, char *argv[]) {
         fprintf(fp,"%d;%.50f;%d\n", npes, total_time, F);
 
         // Closing CSV file
-        fclose(fp);
-
+        fclose(fp); 
+        free_matrix(A, N);
+    }else{
+        free_matrix(A, F);
     }
 
-    free_matrix(A, N);
     MPI_Finalize();
     return 0;
 }
