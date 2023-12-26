@@ -11,7 +11,7 @@
 module load cesga/2020 gcc openmpi/4.1.1_ft3
 
 for nN in {2,4,8}; do
-  for np in {2,4,8,16,32}; do
+  for np in {2,4}; do
     echo $np $nN
     if [ $np -ge $nN ]; then
       echo "Executing..."
