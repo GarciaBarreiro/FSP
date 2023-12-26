@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     short start = 0;
 
     if(!node) {
-        // Empieza a trabajar cuando el último nodo acaba la función allocate_matrix()
+        // Empieza a trabajar cuando el nodo 1 acaba la función allocate_matrix()
         MPI_Recv(&start,1,MPI_SHORT,1,MPI_ANY_TAG,MPI_COMM_WORLD,NULL);
         long fila = 0;
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 
         double **A = allocate_matrix(F, N);
         
-        if(node == npes-1) {
+        if(node == 1) {
             MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
