@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 	printf( "TODO BIEN HASTA AQUI \n");
 	
         if(node == 1) {
-            MPI_Send(start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
+            MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
         for (int i = 0; i < F; i++) {
