@@ -106,7 +106,6 @@ int main(int argc, char *argv[]) {
         for (int nodo_dest = 1; nodo_dest < npes; nodo_dest++){
             for (long i = 0; i < F; i++){
                 fila = (nodo_dest - 1) * F + i;
-                printf("%d: row = %ld\n", node, fila);
                 MPI_Send(A[fila], N, MPI_DOUBLE, nodo_dest, nodo_dest, MPI_COMM_WORLD);
             }
 
@@ -139,15 +138,12 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-	    printf("S_local node 0: %f\n",s_local);
     }else{
         for (long i = 0; i < F; i++) {
             for (long j = 0; j < N; j++) {
-		printf("%f",A[i][j]);
                 s_local += A[i][j] * A[i][j];
             }
         }
-	    printf("\nS_local: %f\n",s_local);
     }
     
     // Reducción para obtener la suma total s en el proceso 0
