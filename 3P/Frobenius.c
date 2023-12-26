@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
 
     if (argc < 3) {
-        printf("Uso: mpirun -np <npes> programa <N> <F>\n");
+        printf("Es necesario definir el tamaño de la matriz y el paso de la distribución.\n");
         return EXIT_FAILURE;
     }
 
@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
         // Inicialización de la matriz A (aquí puedes cargarla desde un archivo o generarla)
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < N; j++) {
-                A[i][j] = (double)rand()/(double) RAND_MAX; // Valores aleatorios entre 0 y 1
+                //A[i][j] = (double)rand()/(double) RAND_MAX; // Valores aleatorios entre 0 y 1
+		A[i][j] = 1.0;
             }
         }
     }
@@ -93,21 +94,12 @@ int main(int argc, char *argv[]) {
     // Envío el tamaño de la Matriz N a todos los procesos
     MPI_Bcast(&N, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
-//    if (node) {
-//        double **A = allocate_matrix(N, N);
-//    }
-
     // Envío el paso F de la distribución cíclica a todos los procesos
     MPI_Bcast(&F, 1, MPI_LONG, 0, MPI_COMM_WORLD);
-
-    // Envío de la matriz A a todos los procesos
-    //MPI_Bcast(&A[0][0], N * N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     short start = 0;
 
     if(!node) {
-
-	printf( "TODO BIEN HASTA AQUI \n");
 	    
         // Empieza a trabajar cuando el nodo 1 acaba la función allocate_matrix()
         MPI_Recv(&start, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
@@ -123,12 +115,8 @@ int main(int argc, char *argv[]) {
 
         }
     } else {
-
-	printf( "TODO BIEN HASTA AQUI \n");
 	    
         double **A = allocate_matrix(F, N);
-
-	printf( "TODO BIEN HASTA AQUI \n");
 	
         if(node == 1) {
             MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
