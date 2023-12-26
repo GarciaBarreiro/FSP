@@ -143,10 +143,11 @@ int main(int argc, char *argv[]) {
     }else{
         for (long i = 0; i < F; i++) {
             for (long j = 0; j < N; j++) {
+		printf("%f",A[i][j]);
                 s_local += A[i][j] * A[i][j];
             }
         }
-	    printf("S_local: %f\n",s_local);
+	    printf("\nS_local: %f\n",s_local);
     }
     
     // Reducción para obtener la suma total s en el proceso 0
