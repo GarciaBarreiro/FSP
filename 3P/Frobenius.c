@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     double overhead, total_time;
 
 
-    if (argc != 3) {
+    if (argc < 3) {
         printf("Uso: mpirun -np <npes> programa <N> <F>\n");
         return EXIT_FAILURE;
     }
