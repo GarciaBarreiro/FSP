@@ -102,14 +102,11 @@ int main(int argc, char *argv[]) {
     short start = 0;
 
     if(!node) {
-
-	printf( "TODO BIEN HASTA AQUI \n");
 	    
         // Empieza a trabajar cuando el nodo 1 acaba la función allocate_matrix()
         MPI_Recv(&start,1,MPI_SHORT,1,MPI_ANY_TAG,MPI_COMM_WORLD,NULL);
         long fila = 0;
 	    
-	printf( "TODO BIEN HASTA AQUI \n");
         for (int nodo_dest = 1; nodo_dest < npes; nodo_dest++){
             for (int i = 0; i < F; i++){
                 fila = (nodo_dest - 1) * F + i;
@@ -120,8 +117,12 @@ int main(int argc, char *argv[]) {
         }
     } else {
 
+	printf( "TODO BIEN HASTA AQUI \n");
+	    
         double **A = allocate_matrix(F, N);
-        
+
+	printf( "TODO BIEN HASTA AQUI \n");
+	
         if(node == 1) {
             MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
