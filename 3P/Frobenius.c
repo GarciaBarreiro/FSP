@@ -80,8 +80,8 @@ int main(int argc, char *argv[]) {
     // Proceso 0 inicializa y envía la matriz A a todos los procesos
     if (!node) {
         // Inicialización de la matriz A (aquí puedes cargarla desde un archivo o generarla)
-        for (i = 0; i < N; i++) {
-            for (j = 0; j < N; j++) {
+        for (long i = 0; i < N; i++) {
+            for (long j = 0; j < N; j++) {
                 A[i][j] = (double)rand()/(double) RAND_MAX; // Valores aleatorios entre 0 y 1
             }
         }
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
 	long fila = 0;
 	    
         for (int nodo_dest = 1; nodo_dest < npes; nodo_dest++){
-            for (int i = 0; i < F; i++){
+            for (long i = 0; i < F; i++){
                 fila = (nodo_dest - 1) * F + i;
                 printf("%d: row = %ld\n", node, fila);
                 MPI_Send(A[fila], N, MPI_DOUBLE, nodo_dest, nodo_dest, MPI_COMM_WORLD);
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
             MPI_Send(&start, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
-        for (int i = 0; i < F; i++) {
+        for (long i = 0; i < F; i++) {
             MPI_Recv(A[i], N, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
         }
 
@@ -145,15 +145,15 @@ int main(int argc, char *argv[]) {
         // que el tamaño en filas de la matriz. El nodo 0 se hará cargo de las filas
         // restantes
         if(F*(npes-1) < N){
-            for(int i = F*(npes-1); i < N; i ++){
-                for (j = 0; j < N; j++) {
+            for(long i = F*(npes-1); i < N; i ++){
+                for (long j = 0; j < N; j++) {
                     s_local += A[i][j] * A[i][j];
                 }
             }
         }
     }else{
-        for (int i = 0; i < F; i++) {
-            for (j = 0; j < N; j++) {
+        for (long i = 0; i < F; i++) {
+            for (long j = 0; j < N; j++) {
                 s_local += A[i][j] * A[i][j];
             }
         }
