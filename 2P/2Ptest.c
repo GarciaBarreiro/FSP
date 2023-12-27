@@ -77,8 +77,8 @@ void _print_matrix(double **mat, long mat_m, long mat_n) {
 
 
 int main(int argc, char *argv[]) {
-    if (argc < 6) {
-        perror("Needed dimensions of both matrices and num of procs.\n");
+    if (argc < 5) {
+        perror("Needed dimensions of both matrices.\n");
         return EXIT_FAILURE;
     }
 
@@ -86,7 +86,6 @@ int main(int argc, char *argv[]) {
     long a_n = atol(argv[2]);
     long b_m = atol(argv[3]);
     long b_n = atol(argv[4]);
-    int num_proc = atoi(argv[5]);
 
     if (a_n != b_m) {
         perror("a_n and b_m must be equal\n");
