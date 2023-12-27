@@ -21,7 +21,7 @@ for nN in {2,4,8}; do
         for F in {4,5,8}; do
           echo $N $F
           for i in {1..3}; do
-            srun -N $nN -n $np $1 $N $N $F $F
+            srun -N $nN -n $np $1 $N $F $F $N
           done
         done
       done
