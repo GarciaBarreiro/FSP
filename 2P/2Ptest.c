@@ -132,6 +132,7 @@ int main(int argc, char *argv[]) {
             }
         }
     } else {
+        
         mat_b = _alloc_matrix(b_m, b_n);
 
         if (node == 1) {    // tells node 0 to start working
@@ -143,6 +144,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    printf("HASTA AQUI TODO CORRECTO\n");
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long fila = 0;
@@ -165,6 +167,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    printf("HASTA AQUI TODO CORRECTO\n");
+
     res = _alloc_matrix(a_m, b_n);
 
     int start = 0;
@@ -172,7 +176,7 @@ int main(int argc, char *argv[]) {
         if (n_rows * (npes - 1) < a_m) {
             start = (npes - 1) * n_rows;
             for (long i = start; i < a_m; i++) {
-                for (long j = 0; j < b_m; j++) {
+                for (long j = 0; j < b_n; j++) {
                     res[i][j] = 0;
                     for (long k = 0; k < a_n; k++) {
                         res[i][j] += mat_a[i][k] * mat_b[k][j];
@@ -190,6 +194,8 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    
+    printf("HASTA AQUI TODO CORRECTO\n");
 
     // sincronizamos todolos procesos, para pasar os resultados a 0
     MPI_Barrier(MPI_COMM_WORLD);
