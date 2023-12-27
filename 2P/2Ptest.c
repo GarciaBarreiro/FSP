@@ -144,7 +144,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("HASTA AQUI TODO CORRECTO\n");
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long fila = 0;
@@ -166,8 +165,6 @@ int main(int argc, char *argv[]) {
             MPI_Recv(mat_a[i], a_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
         }
     }
-
-    printf("HASTA AQUI TODO CORRECTO\n");
 
     res = _alloc_matrix(a_m, b_n);
 
@@ -194,8 +191,6 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
-    printf("HASTA AQUI TODO CORRECTO\n");
 
     // sincronizamos todolos procesos, para pasar os resultados a 0
     MPI_Barrier(MPI_COMM_WORLD);
