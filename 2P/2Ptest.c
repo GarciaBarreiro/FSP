@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
         }
     } else {
         for (long i = 0; i < a_m; i++) {
-            for (long j = 0; j < b_m; j++) {
+            for (long j = 0; j < b_n; j++) {
                 res[i][j] = 0;
                 for (long k = 0; k < a_n; k++) {
                     res[i][j] += mat_a[i][k] * mat_b[k][j];
