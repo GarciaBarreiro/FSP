@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
     MPI_Bcast(&b_m, 1, MPI_LONG, 0, MPI_COMM_WORLD);
     MPI_Bcast(&b_n, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
+    short flag;
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long fila = 0;
@@ -143,14 +144,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    short flag;
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
-        long col = 0;
+        long fila = 0;
         for (int dest = 1; dest < npes; dest++) {
             for (long i = 0; i < n_rows; i++) {
-                col = (dest - 1) * n_rows + i;
-                MPI_Send(mat_a[col], a_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);
+                fila = (dest - 1) * n_rows + i;
+                MPI_Send(mat_a[fila], a_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);
             }
         }
     } else {
@@ -162,14 +162,15 @@ int main(int argc, char *argv[]) {
         }
 
         for (long i = 0; i < a_m; i++) {
-            MPI_Recv(mat_a[i], mat_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
+            MPI_Recv(mat_a[i], a_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
         }
     }
 
     res = _alloc_matrix(a_m, b_n);
 
+    int start = 0;
     if (!node) {
-        if (n_rows * (npes - 1) < mat_m) {
+        if (n_rows * (npes - 1) < a_m) {
             start = (npes - 1) * n_rows;
             for (long i = start; i < a_m; i++) {
                 for (long j = 0; j < b_m; j++) {
@@ -195,7 +196,7 @@ int main(int argc, char *argv[]) {
     MPI_Barrier(MPI_COMM_WORLD);
 
     if (!node) {
-        
+
         for (int dest = 1; dest < npes; dest++) {
             MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
             for (long i = 0; i < n_rows; i++) {
