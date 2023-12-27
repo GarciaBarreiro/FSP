@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
             MPI_Send(&flag, 1, MPI_SHORT, 0, 1, MPI_COMM_WORLD);
         }
 
-        for (long i = 0; i < a_m; i++) {
+        for (long i = 0; i < b_m; i++) {
             MPI_Recv(mat_b[i], b_n, MPI_DOUBLE, 0, node, MPI_COMM_WORLD, NULL);
         }
     }
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    
+
     printf("HASTA AQUI TODO CORRECTO\n");
 
     // sincronizamos todolos procesos, para pasar os resultados a 0
