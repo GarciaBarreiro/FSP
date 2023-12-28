@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 
     	
     if (npes - 1 > b_m) {
-        //printf("Número de nodos excesivo para el tamaño de la matriz.\n");
-        //printf("Reduzca el número de nodos.\n");
+        printf("Número de nodos excesivo para el tamaño de la matriz.\n");
+        printf("Reduzca el número de nodos.\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
         return 1;
     }
@@ -198,7 +198,6 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
-            printf("ENTRE Y TODO BIEN\n");
         }
         
     } else {
@@ -238,8 +237,10 @@ int main(int argc, char *argv[]) {
 
     if (!node) {
         printf("\nRESULT:\n");
-        _print_matrix(res, a_m, b_n);
-        printf("\n");
+        if(a_m<100){
+            _print_matrix(res, a_m, b_n);
+            printf("\n");
+        }
 
         FILE *fp = fopen("res_2P.csv", "a");
         if (!fp) {
