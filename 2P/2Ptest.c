@@ -76,6 +76,14 @@ void _print_matrix(double **mat, long mat_m, long mat_n) {
 }
 
 
+void free_matrix(double **matrix, int rows) {
+    for (int i = 0; i < rows; i++) {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+
 int main(int argc, char *argv[]) {
     if (argc < 5) {
         perror("Needed dimensions of both matrices.\n");
