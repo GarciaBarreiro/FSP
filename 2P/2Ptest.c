@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
 
     	
-    if (npes > b_m) {
+    if (npes - 1 > b_m) {
         //printf("Número de nodos excesivo para el tamaño de la matriz.\n");
         //printf("Reduzca el número de nodos.\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
