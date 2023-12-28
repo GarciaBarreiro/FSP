@@ -198,8 +198,9 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
+            printf("ENTRE Y TODO BIEN\n");
         }
-        printf("ENTRE Y TODO BIEN\n");
+        
     } else {
         for (long i = 0; i < a_m; i++) {
             for (long j = 0; j < b_n; j++) {
