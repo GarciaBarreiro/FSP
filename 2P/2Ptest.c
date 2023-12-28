@@ -160,6 +160,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // sincronizamos todolos procesos, para pasar as filas que corresponden
+    MPI_Barrier(MPI_COMM_WORLD);
+
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
         long fila = 0;
