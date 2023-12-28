@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
             MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
             for (long i = 0; i < n_rows; i++) {
                 // é dest-1 porque eu os que calculo na 3P son os do final
-                MPI_Recv(&res[(dest - 1)*n_rows + i], n_rows, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);
+                MPI_Recv(&res[(dest - 1)*n_rows + i], b_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);
             }
         }
 
@@ -226,9 +226,14 @@ int main(int argc, char *argv[]) {
             printf("Error opening CSV\n");
             return EXIT_FAILURE;
         }
-
+        
         fprintf(fp, "%d, %ld, %ld, %ld, %ld, %.50f\n", npes, a_m, a_n, b_m, b_n, total_time);
+        // Closing CSV file
+        fclose(fp); 
     }
+
+    free_matrix(mat_a, a_m);
+    free_matrix(mat_b, b_m);
 
     MPI_Finalize();
 
