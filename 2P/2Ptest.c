@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
             MPI_Send(&flag, 1, MPI_SHORT, dest, dest, MPI_COMM_WORLD);
             for (long i = 0; i < n_rows; i++) {
                 // é dest-1 porque eu os que calculo na 3P son os do final
-                MPI_Recv(&res[(dest - 1)*n_rows + i], b_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);
+                MPI_Recv(res[(dest - 1)*n_rows + i], b_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD, NULL);
             }
         }
 
