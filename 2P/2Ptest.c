@@ -197,9 +197,10 @@ int main(int argc, char *argv[]) {
                     for (long k = 0; k < a_n; k++) {
                         res[i][j] += mat_a[i][k] * mat_b[k][j];
                     }
-            }
+                }
             }
         }
+        printf("ENTRE Y TODO BIEN\n");
     } else {
         for (long i = 0; i < a_m; i++) {
             for (long j = 0; j < b_n; j++) {
