@@ -5,7 +5,7 @@
 #SBATCH -e ex1_%j.err
 #SBATCH -N 8
 #SBATCH -n 64
-#SBATCH -t 08:00:00
+#SBATCH -t 04:00:00
 #SBATCH --mem=200G
 
 module load cesga/2020 gcc openmpi/4.1.1_ft3
