@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
 
     	
     if (npes > b_m) {
-        printf("Número de nodos excesivo para el tamaño de la matriz.\n");
-        printf("Reduzca el número de nodos.\n");
+        //printf("Número de nodos excesivo para el tamaño de la matriz.\n");
+        //printf("Reduzca el número de nodos.\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
         return 1;
     }
@@ -141,7 +141,6 @@ int main(int argc, char *argv[]) {
     short flag;
     if (!node) {
         MPI_Recv(&flag, 1, MPI_SHORT, 1, MPI_ANY_TAG, MPI_COMM_WORLD, NULL);
-        long fila = 0;
         for (int dest = 1; dest < npes; dest++) {
             for (long i = 0; i < b_m; i++) {
                 MPI_Send(mat_b[i], b_n, MPI_DOUBLE, dest, dest, MPI_COMM_WORLD);
