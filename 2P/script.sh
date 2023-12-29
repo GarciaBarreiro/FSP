@@ -18,7 +18,7 @@ for nN in {4,8}; do
       for M in {100,1000,5000}; do
         for N in {100,1000,5000}; do
           echo $M $N
-          for i in {1..3}; do
+          for i in {1..2}; do
             srun -N $nN -n $np $1 $M $N $N $M
           done
         done
