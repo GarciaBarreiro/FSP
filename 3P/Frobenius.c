@@ -79,11 +79,10 @@ int main(int argc, char *argv[]) {
     // Proceso 0 inicializa y envía la matriz A a todos los procesos
     if (!node) {
 	A = allocate_matrix(N, N);
-        // Inicialización de la matriz A (aquí puedes cargarla desde un archivo o generarla)
+        // Inicialización de la matriz A
         for (long i = 0; i < N; i++) {
             for (long j = 0; j < N; j++) {
-                //A[i][j] = (double)rand()/(double) RAND_MAX; // Valores aleatorios entre 0 y 1
-		A[i][j] = 1.0;
+                A[i][j] = (double)rand()/(double) RAND_MAX; // Valores aleatorios entre 0 y 1
             }
         }
     }
