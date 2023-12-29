@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
             printf("\n");
         }
 
-        FILE *fp = fopen("res_2P-3.csv", "a");
+        FILE *fp = fopen("res_2P-4.csv", "a");
         if (!fp) {
             printf("Error opening CSV\n");
             return EXIT_FAILURE;
