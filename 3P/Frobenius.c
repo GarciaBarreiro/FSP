@@ -60,6 +60,13 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &node);
     MPI_Comm_size(MPI_COMM_WORLD, &npes);
 
+
+    // Envío el tamaño de la Matriz N a todos los procesos
+    MPI_Bcast(&N, 1, MPI_LONG, 0, MPI_COMM_WORLD);
+
+    // Envío el paso F de la distribución cíclica a todos los procesos
+    MPI_Bcast(&F, 1, MPI_LONG, 0, MPI_COMM_WORLD);
+
     double s_local = 0.0, s = 0.0, norm = 0.0;
 	
     if (npes > N) {
@@ -86,12 +93,6 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
-    // Envío el tamaño de la Matriz N a todos los procesos
-    MPI_Bcast(&N, 1, MPI_LONG, 0, MPI_COMM_WORLD);
-
-    // Envío el paso F de la distribución cíclica a todos los procesos
-    MPI_Bcast(&F, 1, MPI_LONG, 0, MPI_COMM_WORLD);
 
     short start = 0;
 
@@ -172,7 +173,7 @@ int main(int argc, char *argv[]) {
         }
         setlocale(LC_ALL, "es_ES.utf8");
 
-        fprintf(fp,"%d;%.50f;%.50f;%ld\n", npes, total_time, norm, F);
+        fprintf(fp,"%d;%.50f;%.50f;%ld\n", npes, total_time, N, F);
 
         // Closing CSV file
         fclose(fp); 
