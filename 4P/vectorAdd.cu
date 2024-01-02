@@ -36,9 +36,9 @@ typedef float basetype;
  * Codigo host
  */
 __host__ void
-h_vectorAdd(const basetype *A, const basetype *B, basetype *C, int numElements)
+h_vectorAdd(const basetype *A, const basetype *B, basetype *C, unsigned int numElements)
 {
-    for (int i = 0; i < numElements; ++i)
+    for (unsigned int i = 0; i < numElements; ++i)
     {
         C[i] = A[i] + B[i];
     }
@@ -48,9 +48,9 @@ h_vectorAdd(const basetype *A, const basetype *B, basetype *C, int numElements)
  * Codigo CUDA
  */
 __global__ void
-vectorAdd(const basetype *A, const basetype *B, basetype *C, int numElements)
+vectorAdd(const basetype *A, const basetype *B, basetype *C, unsigned int numElements)
 {
-    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
 
     if (i < numElements)
     {
@@ -166,7 +166,7 @@ main(int argc, char *argv[])
 
 
     // Verifica que la suma es correcta
-    for (int i = 0; i < numElements; ++i)
+    for (unsigned int i = 0; i < numElements; ++i)
     {
         if (fabs(h_C2[i] - h_C[i]) > 1e-5)
         {
