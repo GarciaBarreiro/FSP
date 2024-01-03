@@ -65,8 +65,7 @@ vectorAdd(const basetype *A, const basetype *B, basetype *C, unsigned int numEle
 int
 main(int argc, char *argv[])
 {
-    basetype *h_A=NULL, *h_B=NULL, *h_C=NULL, *h_C2=NULL;
-    basetype *d_A=NULL, *d_B=NULL, *d_C=NULL;
+    basetype *A=NULL, *B=NULL, *C=NULL, *C2=NULL;
     unsigned int numElements = 0, tpb = 0, nreps=1;
     size_t size = 0;
     // Valores para la medida de tiempos
@@ -94,25 +93,36 @@ main(int argc, char *argv[])
     printf("Suma de vectores de %u elementos (%u reps), con %u bloques de %u threads\n",
       numElements, nreps, blocksPerGrid.x, threadsPerBlock.x);
 
+    TSET(tstart);
     // Reserva memoria en el host
-    h_A = (basetype *) malloc(size);
-    h_B = (basetype *) malloc(size);
-    h_C = (basetype *) malloc(size);
-    h_C2 = (basetype *) malloc(size);
+    checkError( cudaMallocManaged((void **) &A, size) );
+    checkError( cudaMemAdvise(A, size, cudaMemAdviseSetAccessedBy, cudaCpuDeviceId) );
+    checkError( cudaMallocManaged((void **) &B, size) );
+    checkError( cudaMemAdvise(B, size, cudaMemAdviseSetAccessedBy, cudaCpuDeviceId) );
+    checkError( cudaMallocManaged((void **) &C2, size) );   // device solution
+    checkError( cudaMemAdvise(C2, size, cudaMemAdviseSetAccessedBy, cudaCpuDeviceId) );
+    C = (basetype *) malloc(size);  // host vector doesn't need to be shared
 
     // Comprueba errores
-    if (h_A == NULL || h_B == NULL || h_C == NULL)
+    if (C == NULL)
     {
         fprintf(stderr, "Error reservando memoria en el host\n");
         exit(EXIT_FAILURE);
     }
+    TSET( tend );
+    tint = TINT(tstart, tend);
+    printf( "HOST: Tempo para reservar vectores de tamaño %u: %lf ms\n", numElements, tint );
 
+    TSET(tstart);
     // Inicializa los vectores en el host
     for (int i = 0; i < numElements; ++i)
     {
-        h_A[i] = rand()/(basetype)RAND_MAX;
-        h_B[i] = rand()/(basetype)RAND_MAX;
+        A[i] = rand()/(basetype)RAND_MAX;
+        B[i] = rand()/(basetype)RAND_MAX;
     }
+    TSET( tend );
+    tint = TINT(tstart, tend);
+    printf( "HOST: Tempo para inicializar vectores de tamaño %u: %lf ms\n", numElements, tint );
 
     /*
     * Hace la suma en el host
@@ -121,37 +131,16 @@ main(int argc, char *argv[])
     TSET(tstart);
     // Suma los vectores en el host nreps veces
     for(unsigned int r = 0; r < nreps; ++r)
-      h_vectorAdd( h_A, h_B, h_C, numElements );
+      h_vectorAdd( A, B, C, numElements );
     // Fin tiempo
     TSET( tend );
     tint = TINT(tstart, tend);
     printf( "HOST: Tiempo para hacer %u sumas de vectores de tamaño %u: %lf ms\n", nreps, numElements, tint );
 
-    /*
-    * Hace la suma en el dispositivo
-    */
-    // Inicio tiempo
-    TSET( tstart );
-    // Reserva memoria en la memoria global del dispositivo
-    checkError( cudaMalloc((void **) &d_A, size) );
-    checkError( cudaMalloc((void **) &d_B, size) );
-    checkError( cudaMalloc((void **) &d_C, size) );
-    TSET( tend );
-    tint = TINT(tstart, tend);
-    printf( "DEVICE: Tiempo para hacer reserva de memoria de tamaño %u: %lf ms\n", numElements, tint );
-
-    TSET( tstart );
-    // Copia los vectores h_A y h_B del host al dispositivo
-    checkError( cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice) );
-    checkError( cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice) );
-    TSET( tend );
-    tint = TINT(tstart, tend);
-    printf( "DEVICE: Tiempo para hacer copia de vectores de tamaño %u: %lf ms\n", numElements, tint );
-
     TSET( tstart );
     // Lanza el kernel CUDA nreps veces
     for(unsigned int r = 0; r < nreps; ++r) {
-      vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+      vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(A, B, C2, numElements);
 
       // Comprueba si hubo un error al el lanzamiento del kernel
       // Notar que el lanzamiento del kernel es asíncrono por lo que
@@ -166,21 +155,10 @@ main(int argc, char *argv[])
     tint = TINT(tstart, tend);
     printf( "DEVICE: Tiempo para hacer %u sumas de vectores de tamaño %u: %lf ms\n", nreps, numElements, tint );
 
-    TSET( tstart );
-    // Copia el vector resultado del dispositivo al host
-    checkError( cudaMemcpy(h_C2, d_C, size, cudaMemcpyDeviceToHost) );
-
-    // Fin tiempo
-    TSET( tend );
-    // Calcula tiempo para la suma en el dispositivo
-    tint = TINT(tstart, tend);
-    printf( "DEVICE: Tiempo para hacer copia de vector a host de tamaño %u: %lf ms\n", numElements, tint );
-
-
     // Verifica que la suma es correcta
     for (unsigned int i = 0; i < numElements; ++i)
     {
-        if (fabs(h_C2[i] - h_C[i]) > 1e-5)
+        if (fabs(C2[i] - C[i]) > 1e-5)
         {
             fprintf(stderr, "Verificacion de resultados falla en el elemento %d!\n", i);
             exit(EXIT_FAILURE);
@@ -190,14 +168,12 @@ main(int argc, char *argv[])
     printf("Suma correcta.\n");
 
     // Liberamos la memoria del dispositivo
-    checkError( cudaFree(d_A) );
-    checkError( cudaFree(d_B) );
-    checkError( cudaFree(d_C) );
+    checkError( cudaFree(A) );
+    checkError( cudaFree(B) );
+    checkError( cudaFree(C2) );
 
     // Liberamos la memoria del host
-    free(h_A);
-    free(h_B);
-    free(h_C);
+    free(C);
 
     printf("Terminamos\n");
     return 0;
