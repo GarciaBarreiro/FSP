@@ -57,9 +57,9 @@ __global__ void
 matrizMul(const basetype *A, const basetype *B, basetype *C, unsigned int matrizDim)
 {
   // TODO: Calcula el indice de la fila de C y A
-  int i = ;
+  int i = blockDim.x * blockIdx.x + threadIdx.x;
   // TODO Calcula el indice de la columna de C y B
-  int j = ;
+  int j = blockDim.y * blockIdx.y + threadIdx.y;
 
   if ((i < matrizDim) && (j < matrizDim))
   {
@@ -105,7 +105,7 @@ main(int argc, char *argv[])
   // Hilos por bloque: primer parámetro dim_x, segundo dim_y
   dim3 threadsPerBlock( tpbdim, tpbdim, 1 );
   // TODO: Calcula el número de bloques en el Grid (bidimensional)
-  dim3 blocksPerGrid( , , 1 );
+  dim3 blocksPerGrid( matrizDim / threadsPerBlock.x, matrizDim / threadsPerBlock.y, 1 );
 
   printf("Multiplicación de matrices de dimension (%u,%u), con (%u,%u) bloques de (%u,%u) threads\n",
     matrizDim, matrizDim, blocksPerGrid.x, blocksPerGrid.y, threadsPerBlock.x, threadsPerBlock.y);
@@ -116,14 +116,14 @@ main(int argc, char *argv[])
   h_C2 = (basetype *) malloc(size);
 
   // Comprueba errores
-  if (h_A == NULL || h_B == NULL || h_C == NULL)
+  if (h_A == NULL || h_B == NULL || h_C == NULL || h_C2 == NULL)
   {
     fprintf(stderr, "Error reservando memoria en el host\n");
     exit(EXIT_FAILURE);
   }
 
   // Inicializa las matrices en el host
-  for (int i = 0; i < numElem; ++i)
+  for (unsigned int i = 0; i < numElem; ++i)
   {
     h_A[i] = rand()/(basetype)RAND_MAX;
     h_B[i] = rand()/(basetype)RAND_MAX;
@@ -152,7 +152,7 @@ main(int argc, char *argv[])
   checkError( cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice) );
 
   // TODO: Lanza el kernel CUDA
-  matrizMul<<<  >>>( d_A, d_B, d_C, matrizDim );
+  matrizMul<<<blocksPerGrid, threadsPerBlock>>>( d_A, d_B, d_C, matrizDim );
 
   // Comprueba si hubo un error al el lanzamiento del kernel
   // Notar que el lanzamiento del kernel es asíncrono por lo que
