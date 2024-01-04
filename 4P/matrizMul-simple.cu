@@ -120,7 +120,7 @@ main(int argc, char *argv[])
   // Hilos por bloque: primer parámetro dim_x, segundo dim_y
   dim3 threadsPerBlock( tpbdimx, tpbdimy, 1 );
   // TODO: Calcula el número de bloques en el Grid (bidimensional)
-  dim3 blocksPerGrid( (B_x+tpbdimx) / threadsPerBlock.x, (A_y+tpbdimy) / threadsPerBlock.y, 1 );
+  dim3 blocksPerGrid( (A_x+tpbdimx) / threadsPerBlock.x, (B_y+tpbdimy) / threadsPerBlock.y, 1 );
 
   printf("Multiplicación de matrices de dimension (%u,%u) y (%u, %u), con (%u,%u) bloques de (%u,%u) threads\n",
     A_x, A_y, B_x, B_y, blocksPerGrid.x, blocksPerGrid.y, threadsPerBlock.x, threadsPerBlock.y);
