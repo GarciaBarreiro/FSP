@@ -60,9 +60,9 @@ __global__ void
 matrizMul(const basetype *A, const basetype *B, basetype *C,
         unsigned int A_x, unsigned int A_y, unsigned int B_x, unsigned int B_y)
 {
-  // TODO: Calcula el indice de la fila de C y A
+  // Calcula el indice de la fila de C y A
   unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-  // TODO Calcula el indice de la columna de C y B
+  // Calcula el indice de la columna de C y B
   unsigned int j = blockDim.y * blockIdx.y + threadIdx.y;
 
   if ((i < A_x) && (j < B_y))
@@ -119,7 +119,7 @@ main(int argc, char *argv[])
   // Caracteristicas del Grid
   // Hilos por bloque: primer parámetro dim_x, segundo dim_y
   dim3 threadsPerBlock( tpbdimx, tpbdimy, 1 );
-  // TODO: Calcula el número de bloques en el Grid (bidimensional)
+  // Calcula el número de bloques en el Grid (bidimensional)
   dim3 blocksPerGrid( (A_x+tpbdimx) / threadsPerBlock.x, (B_y+tpbdimy) / threadsPerBlock.y, 1 );
 
   printf("Multiplicación de matrices de dimension (%u,%u) y (%u, %u), con (%u,%u) bloques de (%u,%u) threads\n",
@@ -165,7 +165,7 @@ main(int argc, char *argv[])
   checkError( cudaMemcpy(d_A, h_A, size_A, cudaMemcpyHostToDevice) );
   checkError( cudaMemcpy(d_B, h_B, size_B, cudaMemcpyHostToDevice) );
 
-  // TODO: Lanza el kernel CUDA
+  // Lanza el kernel CUDA
   matrizMul<<<blocksPerGrid, threadsPerBlock>>>( d_A, d_B, d_C, A_x, A_y, B_x, B_y );
 
   // Comprueba si hubo un error al el lanzamiento del kernel
@@ -194,6 +194,7 @@ main(int argc, char *argv[])
     if (fabs(h_C2[i] - h_C[i]) > 1e-3)
     {
       printf("h_C2[%u] = %lf, h_C[%u] = %lf\n", i, h_C2[i], i, h_C[i]);
+      error = 1;
     }
   }
 

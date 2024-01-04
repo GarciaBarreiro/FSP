@@ -19,18 +19,9 @@ inline void asserError(cudaError_t code, const char *file, int line, bool abort=
 #define TSET(time)  clock_gettime( CLOCK_MONOTONIC, &(time) )
 #define TINT(ts,te) { ( (double) 1000.*( (te).tv_sec - (ts).tv_sec ) + ( (te).tv_nsec - (ts).tv_nsec )/(double) 1.e6 ) }
 
-// Numero maximo de threads por cada dimensión del bloque
-// Consideramos threadsPerBlock.x == threadsPerBlock.y
-//
-#define MAX_TH_PER_BLOCK_DIM 34
-
 // Tamanho por defecto de las matrices
 #define MATDIMDEFX 1000
 #define MATDIMDEFY 1000
-
-// Numero de threads por cada dimensión bloque por defecto
-#define TPBDIMDEFX 4
-#define TPBDIMDEFY 4
 
 // Tipo de datos
 typedef float basetype;
@@ -62,7 +53,6 @@ main(int argc, char *argv[])
 {
   basetype *h_A=NULL, *h_B=NULL, *h_C=NULL, *h_C2=NULL;
   basetype *d_A=NULL, *d_B=NULL, *d_C=NULL;
-  unsigned int tpbdimx = 1, tpbdimy = 1;
   unsigned int A_x = 1, A_y = 1, B_x = 1, B_y = 1;
   unsigned int numElem_A = 1, numElem_B = 1, numElem_C = 1;
   size_t size_A = 0, size_B = 0, size_C = 0;
@@ -84,23 +74,9 @@ main(int argc, char *argv[])
   size_B = numElem_B * sizeof(basetype);
   size_C = numElem_C * sizeof(basetype);
 
-  // Numero de threads por cada dimension  del bloque
-  tpbdimx = (argc > 4) ? atoi(argv[4]):TPBDIMDEFX;
-  tpbdimy = (argc > 5) ? atoi(argv[5]):TPBDIMDEFY;
-  // Comprueba si es superior al máximo
-  tpbdimx = (tpbdimx > MAX_TH_PER_BLOCK_DIM) ? MAX_TH_PER_BLOCK_DIM:tpbdimx;
-  tpbdimy = (tpbdimy > MAX_TH_PER_BLOCK_DIM) ? MAX_TH_PER_BLOCK_DIM:tpbdimy;
-
   check_memoria( numElem_A, numElem_B, numElem_C );
 
-  // Caracteristicas del Grid
-  // Hilos por bloque: primer parámetro dim_x, segundo dim_y
-  dim3 threadsPerBlock( tpbdimx, tpbdimy, 1 );
-  // TODO: Calcula el número de bloques en el Grid (bidimensional)
-  dim3 blocksPerGrid( (A_x+tpbdimx) / threadsPerBlock.x, (B_y+tpbdimy) / threadsPerBlock.y, 1 );
-
-  printf("Multiplicación de matrices de dimension (%u,%u) y (%u, %u), con (%u,%u) bloques de (%u,%u) threads\n",
-    A_x, A_y, B_x, B_y, blocksPerGrid.x, blocksPerGrid.y, threadsPerBlock.x, threadsPerBlock.y);
+  printf("Multiplicación de matrices de dimension (%u,%u) y (%u, %u)\n", A_x, A_y, B_x, B_y);
 
   h_A = (basetype *) malloc(size_A);
   h_B = (basetype *) malloc(size_B);
@@ -175,6 +151,7 @@ main(int argc, char *argv[])
     if (fabs(h_C2[i] - h_C[i]) > 1e-3)
     {
       printf("h_C2[%u] = %lf, h_C[%u] = %lf\n", i, h_C2[i], i, h_C[i]);
+      error = 1;
     }
   }
 
