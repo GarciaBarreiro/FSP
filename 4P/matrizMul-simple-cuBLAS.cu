@@ -54,30 +54,6 @@ h_matrizMul(const basetype *A, const basetype *B, basetype *C,
 }
 
 /**
- * Codigo CUDA
- * Cada thread computa un elemento de C
- */
-__global__ void
-matrizMul(const basetype *A, const basetype *B, basetype *C,
-        unsigned int A_x, unsigned int A_y, unsigned int B_x, unsigned int B_y)
-{
-  // TODO: Calcula el indice de la fila de C y A
-  unsigned int i = blockDim.x * blockIdx.x + threadIdx.x;
-  // TODO Calcula el indice de la columna de C y B
-  unsigned int j = blockDim.y * blockIdx.y + threadIdx.y;
-
-  if ((i < A_x) && (j < B_y))
-  {
-    basetype sum = (basetype) 0.0;
-    for(unsigned int k = 0; k < A_y; ++k)
-    {
-      sum += A[i*A_y + k]*B[k*B_y + j];
-    }
-    C[i*B_y + j] = sum;
-  }
-}
-
-/**
  * Funcion main en el host
  * Parametros: nElementos threadsPerBlock
  */
@@ -168,7 +144,7 @@ main(int argc, char *argv[])
 
   const float alpha = 1.0f, beta = 0.0f;
   cublasHandle_t handle;
-  cublasCreate_v2(&handle);
+  cublasCreate(&handle);
 
   cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, B_y, A_x, A_y,
           &alpha, d_B, B_y, d_A, A_y, &beta, d_C, B_y);
